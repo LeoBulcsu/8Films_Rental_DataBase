@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `8Films_db`.`actors` (
   `last_name` TEXT NULL DEFAULT NULL,
   `last_update` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  INDEX `ACT` (`actor_id` ASC) VISIBLE)
+  INDEX `actor` (`actor_id` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `8Films_db`.`category` (
   `name` TEXT NULL DEFAULT NULL,
   `last_update` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  INDEX `CAT` (`category_id` ASC) VISIBLE)
+  INDEX `category` (`category_id` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `8Films_db`.`customers` (
   `phone` TEXT NULL DEFAULT NULL,
   `email` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  INDEX `CUST` (`customer_id` ASC) VISIBLE)
+  INDEX `CUSTOMER` (`customer_id` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -86,10 +86,10 @@ CREATE TABLE IF NOT EXISTS `8Films_db`.`films` (
   `category_id` INT NOT NULL,
   `actor_id` INT NOT NULL,
   PRIMARY KEY (`ID`),
-  INDEX `FILM` (`film_id` ASC) VISIBLE,
-  INDEX `LANG` (`language_id` ASC) VISIBLE,
-  INDEX `CAT` (`category_id` ASC) VISIBLE,
-  INDEX `ACT` (`actor_id` ASC) VISIBLE)
+  INDEX `film_id` (`film_id` ASC) VISIBLE,
+  INDEX `language_id` (`language_id` ASC) VISIBLE,
+  INDEX `category_id` (`category_id` ASC) VISIBLE,
+  INDEX `actor_id` (`actor_id` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -106,6 +106,67 @@ CREATE TABLE IF NOT EXISTS `8Films_db`.`stores` (
   `email` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
   INDEX `STORE` (`Store_ID` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `8Films_db`.`inventory`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `8Films_db`.`inventory` (
+  `ID` INT NOT NULL,
+  `inventory_id` INT NOT NULL,
+  `film_id` INT NOT NULL,
+  `store_id` INT NOT NULL,
+  `last_update` DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`, `store_id`, `inventory_id`, `film_id`),
+  INDEX `STORE_idx` (`store_id` ASC) VISIBLE,
+  INDEX `INVENTORY` (`inventory_id` ASC) VISIBLE,
+  INDEX `FILMS` (`film_id` ASC) VISIBLE,
+  CONSTRAINT `STORE`
+    FOREIGN KEY (`store_id`)
+    REFERENCES `8Films_db`.`stores` (`Store_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FILM_ID`
+    FOREIGN KEY (`film_id`)
+    REFERENCES `8Films_db`.`films` (`film_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `8Films_db`.`language`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `8Films_db`.`language` (
+  `ID` INT NOT NULL,
+  `language_id` INT NOT NULL,
+  `name` TEXT NULL DEFAULT NULL,
+  `last_update` DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  INDEX `LANGUAGE` (`language_id` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `8Films_db`.`new_hdd`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `8Films_db`.`new_hdd` (
+  `ID` INT NOT NULL,
+  `first_name` TEXT NULL,
+  `last_name` TEXT NULL DEFAULT NULL,
+  `title` TEXT NULL DEFAULT NULL,
+  `release_year` INT NULL DEFAULT NULL,
+  `category_id` INT NOT NULL,
+  `name` TEXT NULL DEFAULT NULL,
+  `actor_id` INT NOT NULL,
+  PRIMARY KEY (`ID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -143,56 +204,25 @@ CREATE TABLE IF NOT EXISTS `8Films_db`.`rental` (
   `return_date` TEXT NULL DEFAULT NULL,
   `return_time` TEXT NULL DEFAULT NULL,
   `last_update` TEXT NULL DEFAULT NULL,
-  PRIMARY KEY (`ID`, `customer_id`, `staff_id`),
-  INDEX `RENT` (`rental_id` ASC) VISIBLE,
-  INDEX `INVT` (`inventory_id` ASC) VISIBLE,
-  INDEX `CUST` (`customer_id` ASC) VISIBLE,
+  PRIMARY KEY (`ID`, `staff_id`, `customer_id`, `inventory_id`),
+  INDEX `RENTAL` (`rental_id` ASC) VISIBLE,
+  INDEX `INVENTORY` (`inventory_id` ASC) VISIBLE,
+  INDEX `CUSTOMER` (`customer_id` ASC) VISIBLE,
   INDEX `STAFF` (`staff_id` ASC) VISIBLE,
-  CONSTRAINT `fk_rental_customers1`
+  INDEX `STAFF_idx` (`staff_id` ASC) VISIBLE,
+  CONSTRAINT `CUSTOMER`
     FOREIGN KEY (`customer_id`)
     REFERENCES `8Films_db`.`customers` (`customer_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_rental_staff1`
+  CONSTRAINT `STAFF`
     FOREIGN KEY (`staff_id`)
     REFERENCES `8Films_db`.`staff` (`staff_id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `8Films_db`.`inventory`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `8Films_db`.`inventory` (
-  `ID` INT NOT NULL,
-  `inventory_id` INT NOT NULL,
-  `film_id` INT NOT NULL,
-  `store_id` INT NOT NULL,
-  `last_update` DATETIME NULL DEFAULT NULL,
-  `rental_ID` INT NOT NULL,
-  `rental_customer_id` INT NOT NULL,
-  `rental_staff_id` INT NOT NULL,
-  PRIMARY KEY (`ID`, `rental_ID`, `rental_customer_id`, `rental_staff_id`, `inventory_id`, `store_id`, `film_id`),
-  INDEX `INVT` (`inventory_id` ASC) VISIBLE,
-  INDEX `FILM` (`film_id` ASC) VISIBLE,
-  INDEX `STORE` (`store_id` ASC) VISIBLE,
-  INDEX `fk_inventory_rental1_idx` (`rental_ID` ASC, `rental_customer_id` ASC, `rental_staff_id` ASC, `inventory_id` ASC) VISIBLE,
-  CONSTRAINT `fk_inventory_stores1`
-    FOREIGN KEY (`store_id`)
-    REFERENCES `8Films_db`.`stores` (`Store_ID`)
-    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_inventory_films1`
-    FOREIGN KEY (`film_id`)
-    REFERENCES `8Films_db`.`films` (`film_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_inventory_rental1`
-    FOREIGN KEY (`rental_ID` , `rental_customer_id` , `rental_staff_id` , `inventory_id`)
-    REFERENCES `8Films_db`.`rental` (`rental_id` , `customer_id` , `staff_id` , `inventory_id`)
+  CONSTRAINT `inventory_id`
+    FOREIGN KEY (`inventory_id`)
+    REFERENCES `8Films_db`.`inventory` (`inventory_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -201,57 +231,22 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `8Films_db`.`language`
+-- Table `8Films_db`.`actors_has_films`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `8Films_db`.`language` (
-  `ID` INT NOT NULL,
-  `language_id` INT NOT NULL,
-  `name` TEXT NULL DEFAULT NULL,
-  `last_update` DATETIME NULL DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  INDEX `LANG` (`language_id` ASC) VISIBLE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `8Films_db`.`new_hdd`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `8Films_db`.`new_hdd` (
-  `ID` INT NOT NULL,
-  `first_name` TEXT NULL DEFAULT NULL,
-  `last_name` TEXT NULL DEFAULT NULL,
-  `title` TEXT NULL DEFAULT NULL,
-  `release_year` INT NULL DEFAULT NULL,
-  `category_id` INT NOT NULL,
-  `name` TEXT NULL DEFAULT NULL,
-  `actor_id` INT NOT NULL,
-  PRIMARY KEY (`ID`),
-  INDEX `CAT` (`category_id` ASC) VISIBLE,
-  INDEX `ACT` (`actor_id` ASC) VISIBLE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `8Films_db`.`films_has_actors`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `8Films_db`.`films_has_actors` (
+CREATE TABLE IF NOT EXISTS `8Films_db`.`actors_has_films` (
+  `actors_ID` INT NOT NULL,
   `films_ID` INT NOT NULL,
-  `actor_ID` INT NOT NULL,
-  PRIMARY KEY (`films_ID`, `actor_ID`),
-  INDEX `fk_films_has_actor_actor1_idx` (`actor_ID` ASC) VISIBLE,
-  CONSTRAINT `fk_films_has_actor_films`
-    FOREIGN KEY (`films_ID` , `actor_ID`)
-    REFERENCES `8Films_db`.`films` (`film_id` , `actor_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_films_has_actor_actor1`
-    FOREIGN KEY (`actor_ID`)
+  PRIMARY KEY (`actors_ID`, `films_ID`),
+  INDEX `fk_actors_has_films_films1_idx` (`films_ID` ASC) VISIBLE,
+  CONSTRAINT `fk_actors_has_films_actors1`
+    FOREIGN KEY (`actors_ID`)
     REFERENCES `8Films_db`.`actors` (`actor_id`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_actors_has_films_films1`
+    FOREIGN KEY (`films_ID`)
+    REFERENCES `8Films_db`.`films` (`film_id`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -259,44 +254,44 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `8Films_db`.`films_has_category`
+-- Table `8Films_db`.`language_has_films`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `8Films_db`.`films_has_category` (
+CREATE TABLE IF NOT EXISTS `8Films_db`.`language_has_films` (
+  `language_ID` INT NOT NULL,
   `films_ID` INT NOT NULL,
-  `category_ID` INT NOT NULL,
-  PRIMARY KEY (`films_ID`, `category_ID`),
-  INDEX `fk_films_has_category_category1_idx` (`category_ID` ASC) VISIBLE,
-  CONSTRAINT `fk_films_has_category_films1`
-    FOREIGN KEY (`films_ID` , `category_ID`)
-    REFERENCES `8Films_db`.`films` (`film_id` , `category_id`)
+  PRIMARY KEY (`language_ID`, `films_ID`),
+  INDEX `fk_language_has_films_films1_idx` (`films_ID` ASC) VISIBLE,
+  CONSTRAINT `fk_language_has_films_language1`
+    FOREIGN KEY (`language_ID`)
+    REFERENCES `8Films_db`.`language` (`language_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_films_has_category_category1`
+  CONSTRAINT `fk_language_has_films_films1`
+    FOREIGN KEY (`films_ID`)
+    REFERENCES `8Films_db`.`films` (`film_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `8Films_db`.`category_has_films`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `8Films_db`.`category_has_films` (
+  `category_ID` INT NOT NULL,
+  `films_ID` INT NOT NULL,
+  PRIMARY KEY (`category_ID`, `films_ID`),
+  INDEX `fk_category_has_films_films1_idx` (`films_ID` ASC) VISIBLE,
+  CONSTRAINT `fk_category_has_films_category1`
     FOREIGN KEY (`category_ID`)
     REFERENCES `8Films_db`.`category` (`category_id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `8Films_db`.`films_has_language`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `8Films_db`.`films_has_language` (
-  `films_ID` INT NOT NULL,
-  `language_ID` INT NOT NULL,
-  PRIMARY KEY (`films_ID`, `language_ID`),
-  INDEX `fk_films_has_language_language1_idx` (`language_ID` ASC) VISIBLE,
-  CONSTRAINT `fk_films_has_language_films1`
-    FOREIGN KEY (`films_ID` , `language_ID`)
-    REFERENCES `8Films_db`.`films` (`film_id` , `language_id`)
-    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_films_has_language_language1`
-    FOREIGN KEY (`language_ID`)
-    REFERENCES `8Films_db`.`language` (`language_id`)
+  CONSTRAINT `fk_category_has_films_films1`
+    FOREIGN KEY (`films_ID`)
+    REFERENCES `8Films_db`.`films` (`film_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
