@@ -1,3 +1,3 @@
-,Store_ID,Address,Phone,email
-0,1,"C/ de Hortaleza, 69, 28004 Madrid",666666666,8filmshortaleza@8films.com
-1,2,"C/ de García de Paredes, 33, 28010 Madrid",888888888,8filmsparedes@8films.com
+;Store_ID;Address;Phone;email
+0;1;Calle de Hortaleza, 69, 28004, Madrid;666666666;8filmshortaleza@8films.com
+1;2;Calle de Garcia de Paredes, 33, 28010, Madrid;888888888;8filmsparedes@8films.com
