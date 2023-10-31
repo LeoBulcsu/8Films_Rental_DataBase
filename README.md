@@ -21,7 +21,7 @@ In particular, I would be interested in:
 
 Film: improve the language-relevant columns. Currently, the original language column has no values and the rental language is English for all. It would be interesting to introduce values relevant to the languages in which you can watch the movie. Nowadays and with the DVD format you can choose the type of language.
 
-I would also like to be able to create new tables with the relationship between the movies, their category, their actors and languages so I can create their proper relations in SQL.
+I would also like to create new tables with the relationship between the movies, their category, their actors and the movie available languages so I can create their proper relations in SQL.
 
 Rental: This is an important table and from a business point of view it should be fundamental. I would be interested in being able to offer the possibility to compare the rental day, the estimated delivery date, the actual delivery date and therefore if it was delivered late. The idea is to be able to then offer real data to the company about the customers, to know if they are reliable or not in the rentals and therefore reward those who are.
 
@@ -36,12 +36,43 @@ We need:     - Customer_ID: identifier number.     - First_Name: First name.    
 
 Store: We need some info about the stores we have. In principle, we only have 2, but we need to catalogue them to know where the movies are and where to go to look for them in case someone calls us to ask for availability.
 
-After doing my cleaning and exporting the new .csv files into the CLEAN folder (you will find it inside the DATA folder of this repo) It was time to create the database.
+After cleaning and exporting the new .csv files into the CLEAN folder (you will find it inside the DATA folder of this repo) It was time to create the database.
+
+
+
+<img width="798" alt="vhs" src="https://github.com/LeoBulcsu/8Films_Rental_DataBase/assets/136447924/72305f0e-7fd7-4fc1-94da-d409aa6020cf">
+
+
+
 
 ## Importing clean data into SQL and creating relations:
 
-Once my data was all clean and organised it was time to create the database. I used MySQL Workbench and you can see the queries related to the creation of the relations in the SQL folder in this repo.
+Once my data was all clean and organised it was time to create the database. I used MySQL Workbench and you can see the queries related to creating the relations in the SQL folder in this repo.
 
 Inside you will find two files, one with the ER Diagram query, where you can check the process done to create the database, importing the data from the .csv files and creating the actual database relations and another one with some queries that I believe any client or even my friend may have.
+
+The most challenging part of the job was creating that relational database. Creating the links between tables so they would have some kind of interactivity with each other. I had it very much clear that I wanted to link the tabs related to languages, categories and actors to the film table, but this was a tricky link because all of those were many-to-many relations, and to create a many-to-many relations I needed a middle table that could hold those indexes or primary keys together. That's when I realised I could use the HDD table that I had created with the actors, films, categories and languages. I know I had to trick it a little for it to work but it could hold together with no problem.
+
+After that, it was a matter of linking the film table with the inventory, which we can not forget it has more id than movies, meaning that even though it has one thousand entries it only covers about 250 movies, because of the copies and all, and also it was very messy (IDs wise). I know this was a bold decision to make, but for some reason, I decided to re-identify those... I know, I am not proud of it, but that's how I played it and it worked, for the sake of practice, but that's all I needed here.
+
+After that, I link the inventory to our rental invoices (the old ones obviously, and this is where my previous trickery worked out... I apologise again) a classic one-to-many relation that would help me retrieve all the film info in the rental invoice and also with the clients and staff from each store. 
+
+Through forward engineer I managed to get that ER QUERY SQL file without an error and to test it I created a few queries that I thought would help me test the relation between tables and also answer some common questions people do in video stores.
+
+It was a real journey, one I would gladly repeat. 
+
+
+### INTERESTING LINKS:
+
+https://dev.mysql.com/doc/workbench/en/
+
+https://dev.mysql.com/doc/workbench/en/wb-eer-diagrams-section.html
+
+https://learnsql.com/blog/sql-basics-cheat-sheet/
+
+https://pandas.pydata.org/docs/
+
+
+
 
 
